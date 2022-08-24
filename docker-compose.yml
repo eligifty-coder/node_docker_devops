@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx:stable-alpine
+  node_app:
+    build:
+      context: ./
+      args:
+        - NODE_ENV=development
+        # we can comment out the nodejs Port, since traffic will hit 
+    # ports:
+    #   - 8000:8000
+    environment:
+      - PORT=8000
+    depends_on:
+      - mongo
+  mongo: 
+    image: mongo
+    volumes:
+      - mongo_db:/data/db
+  redis:
+    image: redis
+
+volumes:
+  mongo_db:
+  
+  # to connect to mongo container we created {node_devops_with_docker_mongo_1}, when we go into the container with exec -it we do
+  # mongo -u {value of the MONGO_INITDB_ROOT_USERNAME in the mongo.env file we create} -p {value of the MONGO_INITDB_ROOT_PASSWORD} ie mongo -u "gift" -p "secret"
+  # still in the mongo folder, to see all databases, just TYPE db
+# type show dbs :::: to list all the databases
+# type use <your database name>  to create a new database eg use mydatabase
+# db.books.insert({"name":"harry potter"}) ::: this creates a table/collection clled books  in the database we are currently in which has the property name:harry potter
+# db.books.find()  :::: gives us the content of the book collection
+#  a quicker way to get into the mongo folder than sudo docker exec -it <container name> sh will be
+# sudo  docker exec -it <container name> mongo -u <{value of the MONGO_INITDB_ROOT_USERNAME in the mongo.env file we create}> -p <{value of the MONGO_INITDB_ROOT_PASSWORD}>  {sudo docker exec -it  node_devops_with_docker_mongo_1 mongo -u "gift" -p "secret"}
+
+# sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml down :::: Removes services otherwise known as containers
+# sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml down  -v :::: removes containers and all associated volumes
+
+# sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build :::: this brings up the containers in the compose file. The --build flags forces the image to update whenever there is an update. therefore the containers use the latest image instead of the stale image
+
+# running docker volume prune in a running container, removes all volumes not used by the container ie remove all unused local volumes
+
+# sudo docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build  ::: this forces a new build when the image changes
+
+# sudo docker inspect <container name> :::: this command spits out details about the container including he ip address
+
+# sudo docker network ls :::: lists of network
+# sudo docker network inspect <network name>
+# sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build --no-deps node_app ::: this only start a single container which is node_app and not run the container it depends on . hence the --no-deps flag
+# -V {capital v} flag ensures that a new anonymous volume is created 
+

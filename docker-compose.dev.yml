@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  nginx:
+    ports:
+      - 8000:80
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  node_app:
+    build: 
+      context: ./
+      args:
+        NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ./.env
+    command: npm run dev
+  mongo:
+    env_file:
+    - ./mongo.env
+
+# RUNNING FOR  DEVELOPMENT ENVIRONMENT
+    # sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+  
